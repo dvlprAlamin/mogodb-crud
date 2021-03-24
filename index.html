@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        body{
+        body {
             text-align: center;
         }
     </style>
 </head>
+
 <body>
     <h1>Welcome to mongo CRUD operation</h1>
     <form action="/addStudent" method="post">
@@ -24,58 +26,69 @@
     </div>
     <div id="update-list"></div>
     <script>
+        function loadAllData() {
             fetch('/students').then(res => res.json())
-            .then(data => {
-                console.log(data);
-                data.forEach(std => {
-                    document.getElementById('student-list').innerHTML += `
-                <p>${std.name}
+                .then(data => {
+                    // console.log(data);
+                    document.getElementById('student-list').innerHTML = '';
+                    data.forEach(std => {
+                        document.getElementById('student-list').innerHTML += `
+                    <p>${std.name}
                     <button onclick="singleStudentData('${std._id}')">Update</button>
-                    <button onclick="deleteStudent('${std._id}')">Delete</button> </p>
+                    <button onclick="deleteStudent(event,'${std._id}')">Delete</button> </p>
                 `
-                });
-                
-            })
-            function deleteStudent(id) {
-                console.log(id);
-                fetch(`/delete/${id}`,{
-                    method:'DELETE'
+                    });
+
                 })
+        };
+        loadAllData();
+        function deleteStudent(event, id) {
+            console.log(id);
+            fetch(`/delete/${id}`, {
+                method: 'DELETE'
+            })
                 .then(res => res.json())
                 .then(result => {
-                    console.log('deleted successfully');
+                    // console.log('deleted successfully');
+                    result && (event.target.parentNode.style.display = 'none');
                 })
-            }
-            function singleStudentData(id){
-                fetch(`/student/${id}`)
+        };
+        function singleStudentData(id) {
+            const updateList =  document.getElementById('update-list');
+            fetch(`/student/${id}`)
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('update-list').innerHTML = `
+                    updateList.innerHTML = `
                     Name: <input type="text" name="name" value="${data.name}" id="name" placeholder="Name"> <br> <br>
                     Roll:<input type="number" name="roll" value="${data.roll}" id="roll" placeholder="Roll"> <br> <br>
                     GPA:<input type="text" name="gpa" value="${data.gpa}" id="gpa" placeholder="GPA"> <br> <br>
                     <button type="submit" onclick="updateStudent('${data._id}')">Update student</button>
                     `
                 })
-            }
-            function updateStudent(id){
-                const name = document.getElementById('name').value;
-                const roll = document.getElementById('roll').value;
-                const gpa = document.getElementById('gpa').value;
-                const stdInfo = {id,name,roll,gpa}
-                // console.log(stdInfo);
-                fetch(`/update/${id}`,{
-                    method:'PATCH',
-                    headers: {
-                        'Content-type': 'application/json; charset=UTF-8',
-                    },
-                    body: JSON.stringify(stdInfo),
-                })
+        };
+        function updateStudent(id) {
+            const name = document.getElementById('name').value;
+            const roll = document.getElementById('roll').value;
+            const gpa = document.getElementById('gpa').value;
+            const stdInfo = { id, name, roll, gpa }
+            // console.log(stdInfo);
+            fetch(`/update/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify(stdInfo),
+            })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
+                    if (data) {
+                        loadAllData();
+                        document.getElementById('update-list').innerHTML = '';
+                    }
                 })
-            }
+        };
     </script>
 </body>
+
 </html>

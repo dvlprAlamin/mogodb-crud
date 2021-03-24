@@ -43,7 +43,8 @@ client.connect(err => {
         {$set:toUpdate,$currentDate: { lastModified: true }})
         .then(result=> {
             // console.log('updated successfully');
-            res.send(result)
+            // res.send(result)
+            res.send(result.modifiedCount > 0)
         })
         .catch(err => {
             console.log('Failed to update');
@@ -53,8 +54,9 @@ client.connect(err => {
         const student = req.body;
         collection.insertOne(student)
             .then(response => {
-                console.log('added successfully');
-                res.send('Success');
+                // console.log('added successfully');
+                // res.send('Success');
+                res.redirect('/');
             })
             .catch(err => {
                 console.log('Failed to add');
@@ -66,7 +68,8 @@ client.connect(err => {
         console.log(req.params.id);
         collection.deleteOne({_id:ObjectId(stdId)})
         .then(response => {
-            console.log(response.deletedCount);
+            // console.log(response.deletedCount);
+            res.send(response.deletedCount > 0);
         })
         .catch(err => console.log(`Delete failed with error: ${err}`))
     })
