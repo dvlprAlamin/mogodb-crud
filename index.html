@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to mongo CRUD operation</h1>
+    <form action="/addStudent" method="post">
+        <input type="text" name="name" id="" placeholder="Name"> <br> <br>
+        <input type="number" name="roll" id="" placeholder="Roll"> <br> <br>
+        <input type="text" name="gpa" id="" placeholder="GPA"> <br> <br>
+        <button type="submit">Add student</button>
+    </form>
+    <div id="student-list">
+
+    </div>
+    <div id="update-list"></div>
+    <script>
+            fetch('/students').then(res => res.json())
+            .then(data => {
+                console.log(data);
+                data.forEach(std => {
+                    document.getElementById('student-list').innerHTML += `
+                <p>${std.name}
+                    <button onclick="singleStudentData('${std._id}')">Update</button>
+                    <button onclick="deleteStudent('${std._id}')">Delete</button> </p>
+                `
+                });
+                
+            })
+            function deleteStudent(id) {
+                console.log(id);
+                fetch(`/delete/${id}`,{
+                    method:'DELETE'
+                })
+                .then(res => res.json())
+                .then(result => {
+                    console.log('deleted successfully');
+                })
+            }
+            function singleStudentData(id){
+                fetch(`/student/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('update-list').innerHTML = `
+                    Name: <input type="text" name="name" value="${data.name}" id="name" placeholder="Name"> <br> <br>
+                    Roll:<input type="number" name="roll" value="${data.roll}" id="roll" placeholder="Roll"> <br> <br>
+                    GPA:<input type="text" name="gpa" value="${data.gpa}" id="gpa" placeholder="GPA"> <br> <br>
+                    <button type="submit" onclick="updateStudent('${data._id}')">Update student</button>
+                    `
+                })
+            }
+            function updateStudent(id){
+                const name = document.getElementById('name').value;
+                const roll = document.getElementById('roll').value;
+                const gpa = document.getElementById('gpa').value;
+                const stdInfo = {id,name,roll,gpa}
+                // console.log(stdInfo);
+                fetch(`/update/${id}`,{
+                    method:'PATCH',
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(stdInfo),
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                })
+            }
+    </script>
+</body>
+</html>
